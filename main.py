@@ -1,4 +1,8 @@
+# -- coding: utf-8 --
+
 import logging
+import json
+import os
 
 this_file = 'req/bin/activate_this.py'
 exec(open(this_file).read(), {'__file__': this_file})
@@ -15,6 +19,10 @@ def handler(event, context):
         name = event['queryStringParameters']['name']
 
     logging.debug('event: %s'%event)
+    body = json.loads(event['body'])
+
+    bot = Bot(os.environ['TELEGRAM_BOT_API'])
+    bot.send_message(chat_id=body['message']['chat']['id'], text='hello')
 
     return {
         'statusCode': 200,
