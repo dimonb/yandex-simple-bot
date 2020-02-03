@@ -1,4 +1,5 @@
 build:
+	$(MAKE) -C locales/ru/LC_MESSAGES
 	zip -r ../yandex-simple-bot.zip  . -x '*.git*'
 
 deploy: build
@@ -8,7 +9,13 @@ deploy: build
 	--runtime python37 \
 	--entrypoint main.handler \
 	--memory 128m \
-	--execution-timeout 5s \
+	--execution-timeout 60s \
 	--package-bucket-name notifyme \
 	--package-object-name yandex-simple-bot.zip \
-	--environment TELEGRAM_BOT_API=${TELEGRAM_BOT_API}
+	--environment TELEGRAM_BOT_API=${TELEGRAM_BOT_API} \
+	--environment https_proxy=${PROXY}
+
+locale: 
+	@pygettext3 -d base -o locales/base.pot main.py
+	@msgmerge -N locales/ru/LC_MESSAGES/base.po locales/base.pot >locales/ru/LC_MESSAGES/base.~po
+	@mv locales/ru/LC_MESSAGES/base.~po locales/ru/LC_MESSAGES/base.po

@@ -7,22 +7,39 @@ import os
 this_file = 'req/bin/activate_this.py'
 exec(open(this_file).read(), {'__file__': this_file})
 
-from telegram import Bot
-from telegram.ext import Dispatcher
+from telegram import Bot, Update
+from telegram.ext import Dispatcher, MessageHandler, CommandHandler, Filters
+
+import gettext
+el = gettext.translation('base', localedir='locales', languages=['ru'])
+el.install()
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
 
-def handler(event, context):
-    name = 'World'
-    if 'queryStringParameters' in event and 'name' in event['queryStringParameters']:
-        name = event['queryStringParameters']['name']
+def echo(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=_('Echo: {}').format(update.message.text))
 
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=_('Notification bot. Will send you a message at given time'))
+
+bot = None
+dispatcher = None
+
+def init():
+    global dispatcher
+    global bot
+    bot = Bot(os.environ['TELEGRAM_BOT_API'])
+    dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(MessageHandler(Filters.all, echo))
+init()
+
+def handler(event, context):
     logging.debug('event: %s'%event)
     body = json.loads(event['body'])
 
-    bot = Bot(os.environ['TELEGRAM_BOT_API'])
-    bot.send_message(chat_id=body['message']['chat']['id'], text='hello')
+    dispatcher.process_update(Update.de_json(body, bot))
 
     return {
         'statusCode': 200,
@@ -30,7 +47,7 @@ def handler(event, context):
             'Content-Type': 'text/plain'
         },
         'isBase64Encoded': False,
-        'body': 'Hello, {}!'.format(name)
+        'body': ''
     }
 
 if __name__ == '__main__':
