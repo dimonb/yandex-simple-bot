@@ -19,3 +19,7 @@ locale:
 	@pygettext3 -d base -o locales/base.pot main.py
 	@msgmerge -N locales/ru/LC_MESSAGES/base.po locales/base.pot >locales/ru/LC_MESSAGES/base.~po
 	@mv locales/ru/LC_MESSAGES/base.~po locales/ru/LC_MESSAGES/base.po
+
+deps:
+	virtualenv -p python3.7 req
+	req/bin/pip install -r requirements.txt
