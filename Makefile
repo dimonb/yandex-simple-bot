@@ -23,3 +23,6 @@ locale:
 deps:
 	virtualenv -p python3.7 req
 	req/bin/pip install -r requirements.txt
+
+freeze:
+	req/bin/pip freeze >requirements.txt
