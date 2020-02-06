@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-02-04 12:52+0000\n"
+"POT-Creation-Date: 2020-02-06 17:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,15 +15,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: main.py:16
-msgid "Echo: {}"
-msgstr "Эххо: {}"
-
-#: main.py:24
+#: main.py:19
 msgid ""
 "Notification bot. Will send you a message at given time\n"
 "Format: YYYY-MM-DD HH:MM <message>"
 msgstr ""
 "Бот нотификаций. Отправит вам сообщение в заданное время\n"
-"Формат: YYYY-MM-DD HH:MM <message>"
+"Формат: YYYY-MM-DD HH:MM <message>\n"
+"Или что-то типа: разбуди меня завтра в 11 часов или напомни закрыть ноут через 1 минуту"
 
+#: main.py:49
+msgid "will notify you at: %s"
+msgstr "Пришлю напоминание: %s"
+
+#~ msgid "Echo: {}"
+#~ msgstr "Эххо: {}"

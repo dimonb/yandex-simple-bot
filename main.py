@@ -7,11 +7,13 @@ import json
 import re
 import bot
 import sqs
+import os
 
 import arrow
 from dateutil import tz
 from datetime import datetime, timedelta
 from telegram.ext import CommandHandler, MessageHandler, Filters
+from rutimeparser import parse, get_last_clear_text
 
 def start(update, context):
     bot.send_message(chat_id=update.effective_chat.id, text=_('''Notification bot. Will send you a message at given time
@@ -20,17 +22,31 @@ bot.dispatcher.add_handler(CommandHandler('start', start))
 
 RE_MESSAGE = re.compile('(\d\d\d\d[-]\d\d[-]\d\d +\d\d[:]\d\d) +(.*)', re.MULTILINE)
 def message(update, context):
+    eta, text = None, None
+
     mo = RE_MESSAGE.match(update.message.text)
     if mo:
+        eta = arrow.get(arrow.get(mo.group(1)).datetime, tz.gettz())
+        text = mo.group(2)
+    else:
+        try:
+            eta = arrow.get(parse(update.message.text, allowed_results=(datetime,), tz=os.environ['TZ']))
+            text = get_last_clear_text(update.message.text)
+        except:
+            logging.exception('error parsing date')
+    logging.debug('eta: %s'%eta)
+    logging.debug('text: %s'%text)
+
+    if text:
         sqs.delay_message(
-            eta = arrow.get(arrow.get(mo.group(1)).datetime, tz.gettz()).to('UTC').naive,
-            text = mo.group(2),
+            eta = eta.to('UTC').naive,
+            text = text,
             chat_id = update.effective_chat.id,
             reply_to_message_id = update.message.message_id,
             quote = True
         )
         bot.send_message(
-            text = 'will notify you at: %s'%mo.group(1),
+            text = _('will notify you at: %s')%eta.format(),
             chat_id = update.effective_chat.id,
             reply_to_message_id = update.message.message_id,
             quote = True
