@@ -7,13 +7,29 @@ deploy: build
 	yc serverless function version create \
 	--function-name=telegram-bot \
 	--runtime python37 \
-	--entrypoint main.handler \
+	--entrypoint main.telegram \
 	--memory 128m \
 	--execution-timeout 60s \
 	--package-bucket-name notifyme \
 	--package-object-name yandex-simple-bot.zip \
 	--environment TELEGRAM_BOT_API=${TELEGRAM_BOT_API} \
-	--environment https_proxy=${PROXY}
+	--environment https_proxy=${PROXY} \
+	--environment AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+	--environment AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+	--environment TZ='Europe/Moscow'
+	yc serverless function version create \
+	--function-name=notify \
+	--runtime python37 \
+	--entrypoint main.notify \
+	--memory 128m \
+	--execution-timeout 60s \
+	--package-bucket-name notifyme \
+	--package-object-name yandex-simple-bot.zip \
+	--environment TELEGRAM_BOT_API=${TELEGRAM_BOT_API} \
+	--environment https_proxy=${PROXY} \
+	--environment AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+	--environment AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+	--environment TZ='Europe/Moscow'
 
 locale: 
 	@pygettext3 -d base -o locales/base.pot main.py
@@ -26,3 +42,8 @@ deps:
 
 freeze:
 	req/bin/pip freeze >requirements.txt
+
+create-functions:
+	yc serverless function create --name=notify
+	yc serverless function create --name=telegram-bot
+	yc serverless function allow-unauthenticated-invoke telegram-bot
