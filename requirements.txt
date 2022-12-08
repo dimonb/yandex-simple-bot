@@ -4,7 +4,7 @@ billiard==3.6.2.0
 boto3==1.11.9
 botocore==1.14.9
 celery==5.2.2
-certifi==2019.11.28
+certifi==2022.12.7
 cffi==1.13.2
 cryptography==3.3.2
 docutils==0.15.2
